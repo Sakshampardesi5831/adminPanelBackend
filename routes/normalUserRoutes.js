@@ -1,24 +1,21 @@
 const express=require("express");
 const router=express.Router();
-const {userHomePage,userSignUp,userSignIn,userSignOut}=require("../controller/normalUserController");
-const {isNormalUserAuthenticated}=require("../middleware/auth")
-
-//GET /basic  FRONT PAGE FOR NORMAL USERS
-
-router.get("/",isNormalUserAuthenticated,userHomePage);
-
-//POST /basic/signup REGISTER ROUTE FOR NORMAL USER
-router.post("/signup",userSignUp);
+const {userSignIn,userSignOut,currentUser}=require("../controller/normalUserController");
+const {isNormalUserAuthenticated}=require("../middleware/auth");
 
 
-//POST /basic/signin LOGIN ROUTE FOR NORMAL USER 
+//GET /basic/currentuser  =>FOR FINDING THE BASIC LOGIN USER
+
+router.get("/currentuser",isNormalUserAuthenticated,currentUser);
+
+//POST /basic/signin  => LOGIN ROUTE FOR BASIC USER
+
 router.post("/signin",userSignIn);
 
 
+//GET /basic/signout => LOGOUT ROUTE FOR BASIC USER
 
-//POST /basic/signout LOGOUT ROUTE FOR NORMAL USER
 router.get("/signout",userSignOut);
-
 
 
 

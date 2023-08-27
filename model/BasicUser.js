@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bycrypt = require("bcryptjs");
-var UserSchema = new mongoose.Schema(
+var BasicSchema = new mongoose.Schema(
   {
     firstname: {
       type: String,
@@ -45,19 +45,13 @@ var UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "ADMIN",
+      default: "BASIC",
     },
-    createdusers:{
-      type:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"basic"
-      }]
-    }
   },
   { timestamps: true }
 );
 
-UserSchema.pre("save", function () {
+BasicSchema.pre("save", function () {
   if (!this.isModified("password")) {
     return;
   }
@@ -65,15 +59,14 @@ UserSchema.pre("save", function () {
   this.password = bycrypt.hashSync(this.password, salt);
 });
 
-UserSchema.methods.comparepassword=function(password){
+BasicSchema.methods.comparepassword=function(password){
   return bycrypt.compareSync(password,this.password);
 };
-UserSchema.methods.generatedJwtToken = function () {
+BasicSchema.methods.generatedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
-const User = mongoose.model("user", UserSchema);
+const Basic = mongoose.model("basic", BasicSchema);
 
-module.exports = User;
-
+module.exports = Basic;

@@ -1,18 +1,20 @@
 const userModel=require("../model/User");
+const basicModel=require("../model/BasicUser");
 const ErrorHandler=require("../utils/ErrorHandler");
 const {CatchAsyncError}=require("../middleware/CatchasyncError");
-const {sendToken}=require("../utils/SendToken");
-
-
+const {sendToken,sendAddedUserToken}=require("../utils/SendToken");
 exports.homepage=CatchAsyncError(async (req,res,next)=>{
     res.status(200).json({message:"Home is Ready"});
 });
-
+exports.currentAdmin=CatchAsyncError(async (req,res,next)=>{
+    const admin= await userModel.findById(req.id).populate("createdusers").exec();
+    res.status(200).json({admin})
+})
 exports.signup=CatchAsyncError(async (req,res,next)=>{
     //  res.json(req.body);
     const user=await new userModel(req.body).save();
     const result=sendToken(user,201,res);
-    res.json({result});
+    res.json(result);
 });
 exports.signin=CatchAsyncError(async (req,res,next)=>{
      const loggedUser=await userModel.findOne({email:req.body.email}).select("+password").exec();
@@ -35,9 +37,30 @@ exports.signout=CatchAsyncError(async (req,res,next)=>{
     res.clearCookie("token");
     res.json({message:"successFully sign out !!!!"});
 });
-
 exports.allBasicUser=CatchAsyncError(async (req,res,next)=>{
      const allUsers=await userModel.find({role:"BASIC"});
      res.json({allUsers});
 });
+exports.addUser=CatchAsyncError(async (req,res,next)=>{
+    const admin=await userModel.findById(req.id).exec();
+    const basicUser=await new basicModel(req.body).save();
+    admin.createdusers.push(basicUser._id);
+    await admin.save();
+    const result=sendAddedUserToken(basicUser,201,res);
+    res.json(result);
+});
 
+exports.editUser=CatchAsyncError(async (req,res,next)=>{
+    const admin = await userModel.findById(req.id).exec();
+    const updateUserDetail=await basicModel.findByIdAndUpdate(req.params.id,req.body);
+    await updateUserDetail.save();
+    await admin.save();
+    res.json({admin,message:"Updated !!!"});
+});
+
+exports.deleteUser=CatchAsyncError(async (req,res,next)=>{
+    const admin = await userModel.findById(req.id).exec();
+    const deleteAccount=await basicModel.findByIdAndDelete(req.params.id);
+    await admin.save();
+    res.json({message:"Account Deleted Successfully"});
+});
