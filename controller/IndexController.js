@@ -3,6 +3,7 @@ const basicModel=require("../model/BasicUser");
 const ErrorHandler=require("../utils/ErrorHandler");
 const {CatchAsyncError}=require("../middleware/CatchasyncError");
 const {sendToken,sendAddedUserToken}=require("../utils/SendToken");
+const { default: mongoose } = require("mongoose");
 exports.homepage=CatchAsyncError(async (req,res,next)=>{
     res.status(200).json({message:"Home is Ready"});
 });
@@ -60,7 +61,10 @@ exports.editUser=CatchAsyncError(async (req,res,next)=>{
 
 exports.deleteUser=CatchAsyncError(async (req,res,next)=>{
     const admin = await userModel.findById(req.id).exec();
-    const deleteAccount=await basicModel.findByIdAndDelete(req.params.id);
+    const basicUser=await basicModel.findOne({_id:req.params.id});
+    admin.createdusers.splice(admin.createdusers.indexOf(basicUser._id),1);
+    await basicModel.findByIdAndDelete(basicUser._id);
     await admin.save();
+    // await basicModel.findByIdAndDelete(req.params.id);
     res.json({message:"Account Deleted Successfully"});
 });

@@ -34,7 +34,7 @@ app.use(session({
 app.use(cookieParser());
 
 app.use("/admin",require("./routes/indexRoutes"));
-// app.use("/basic",require("./routes/normalUserRoutes"));
+app.use("/basic",require("./routes/normalUserRoutes"));
 //ERROR HANDLING 
 const {generatedError}=require("./middleware/error");
 const ErrorHandler=require("./utils/ErrorHandler")
