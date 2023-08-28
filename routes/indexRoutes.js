@@ -26,7 +26,7 @@ router.get("/signout",signout);
  
 router.get("/alluser",isAuthenticated,allBasicUser);
 
-//GET /admin/addUser  => Register All Basic User by Admin
+//POST /admin/addUser  => Register All Basic User by Admin
 
 router.post("/adduser",isAuthenticated,addUser);
 
