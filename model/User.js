@@ -70,7 +70,7 @@ UserSchema.methods.comparepassword=function(password){
 };
 UserSchema.methods.generatedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
+    expiresIn:"1d",
   });
 };
 const User = mongoose.model("user", UserSchema);
